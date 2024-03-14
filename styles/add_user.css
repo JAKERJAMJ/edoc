@@ -1,0 +1,58 @@
+.title {
+    padding: 30px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 30px;
+    font-weight: bold;
+}
+.add-button {
+    text-align: center;
+}
+.view-user {
+    padding: 50px;
+}
+.title-add{
+    margin-top: 10px;
+    font-size: 22px;
+    font-weight: bold;
+}
+.add-user {
+    display: none;
+    position: fixed;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 3rem;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    text-align: center; /* จัดข้อความตรงกลาง */
+    width: 45%;
+    max-height: 70%;
+    left: 28%;
+    top: 20%;
+    z-index: 99999;
+    overflow-y: auto;
+}
+.title-edit {
+    margin-top: 10px;
+    font-size: 22px;
+    font-weight: bold;
+}
+.edit-user {
+    display: none;
+    position: fixed;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 3rem;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    text-align: center; /* จัดข้อความตรงกลาง */
+    width: 45%;
+    max-height: 70%;
+    left: 30%;
+    top: 20%;
+    z-index: 99999;
+    overflow-y: auto;
+}

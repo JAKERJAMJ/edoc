@@ -1,0 +1,24 @@
+.login {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    transform: translate(-50%,-20%);
+    top: 50%; /* ย้ายไปยังจุดกึ่งกลางในแนวตั้ง */
+    left: 50%; /* ย้ายไปยังจุดกึ่งกลางในแนวนอน */
+    margin-top: -150px; /* ขนาดครึ่งของความสูงของ .login */
+    width: 500px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 20px;
+    box-shadow: 0px 0px 5px rgb(0,0,0,0.3);
+
+}
+
+.title-login {
+    font-size: 28px;
+    padding: 20px;
+}
+
+.input-container {
+    padding: 20px;
+}

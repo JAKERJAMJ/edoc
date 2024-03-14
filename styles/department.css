@@ -1,0 +1,59 @@
+.title {
+    padding: 30px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 30px;
+    font-weight: bold;
+}
+.add-button{
+    align-items: center;
+    text-align: center;
+}
+.view-department{
+    padding: 50px;
+}
+.view-department table {
+    margin: auto;
+}
+.view-department table th,td {
+    text-align: center;
+}
+.add-de {
+    display: none;
+    position: fixed;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 3rem;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    text-align: center; /* จัดข้อความตรงกลาง */
+    width: 45%;
+    max-height: 80%;
+    left: 30%;
+    top: 20%;
+    z-index: 99999;
+}
+.edit-de {
+    display: none;
+    position: fixed;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 3rem;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    text-align: center; /* จัดข้อความตรงกลาง */
+    width: 45%;
+    max-height: 80%;
+    left: 30%;
+    top: 20%;
+    z-index: 99999;
+}
+#edit-text {
+    margin-bottom: 20px;
+}
+.navber-text {
+    font-size: 30px;
+}

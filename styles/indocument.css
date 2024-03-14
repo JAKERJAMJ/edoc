@@ -1,0 +1,59 @@
+.top-title {
+    text-align: center;
+    padding: 30px;
+    font-size: 30px;
+    font-weight: bold;
+}
+.add-button {
+    text-align: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.view-document {
+    padding: 50px;
+}
+.view-document table {
+    margin: auto;
+}
+.view-document table th,td {
+    text-align: center;
+}
+.add-document {
+    display: none;
+    position: fixed;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 3rem;
+    justify-content: start;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    text-align: center; /* จัดข้อความตรงกลาง */
+    width: 45%;
+    max-height: 80%;
+    left: 28%;
+    top: 10%;
+    z-index: 99999;
+    overflow-y: auto;
+}
+.add-document .title-add {
+    margin-top: 10px;
+    font-size: 22px;
+    font-weight: bold;
+}
+.edit-document {
+    display: none;
+    position: fixed;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 3rem;
+    justify-content: start;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    text-align: center; /* จัดข้อความตรงกลาง */
+    width: 45%;
+    max-height: 80%;
+    left: 28%;
+    top: 10%;
+    z-index: 99999;
+    overflow-y: auto;
+}
