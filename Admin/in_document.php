@@ -87,10 +87,10 @@ require 'adminnav.php';
             <div class="title-add">
                 เพิ่มเอกสารบันทึกข้อความ
             </div>
-            <form action="ex_document.php" method="POST" enctype="multipart/form-data">
+            <form action="in_document.php" method="POST" enctype="multipart/form-data">
                 <div class="form-group my-3">
-                    <label for="docex_number"><strong>ที่</strong></label>
-                    <input type="text" id="docex_number" name="docex_number" class="form-control" placeholder="" value="">
+                    <label for="docin_number"><strong>ที่</strong></label>
+                    <input type="text" id="docin_number" name="docin_number" class="form-control" placeholder="" value="">
                 </div>
                 <div class="form-group my-3">
                     <strong>ชนิดเอกสาร</strong>
@@ -116,24 +116,24 @@ require 'adminnav.php';
                     </select>
                 </div>
                 <div class="form-group my-3">
-                    <label for="docex_date"><strong>ลงวันที่</strong></label>
-                    <input type="date" id="docex_date" name="docex_date" class="form-control" placeholder="" value="">
+                    <label for="docin_date"><strong>ลงวันที่</strong></label>
+                    <input type="date" id="docin_date" name="docin_date" class="form-control" placeholder="" value="">
                 </div>
                 <div class="form-group my-3">
-                    <label for="docex_title"><strong>เรื่อง</strong></label>
-                    <input type="text" id="docex_title" name="docex_title" class="form-control" placeholder="" value="">
+                    <label for="docin_title"><strong>เรื่อง</strong></label>
+                    <input type="text" id="docin_title" name="docin_title" class="form-control" placeholder="" value="">
                 </div>
                 <div class="form-group my-3">
-                    <label for="docex_sent_from"><strong>ส่งมาจาก</strong></label>
-                    <input type="text" id="docex_sent_from" name="docex_sent_from" class="form-control" placeholder="" value="">
+                    <label for="docin_sent_from"><strong>ส่งมาจาก</strong></label>
+                    <input type="text" id="docin_sent_from" name="docin_sent_from" class="form-control" placeholder="" value="">
                 </div>
                 <div class="form-group my-3">
-                    <label for="docex_sent_to"><strong>ถึง</strong></label>
-                    <input type="text" id="docex_sent_to" name="docex_sent_to" class="form-control" placeholder="" value="">
+                    <label for="docin_sent_to"><strong>ถึง</strong></label>
+                    <input type="text" id="docin_sent_to" name="docin_sent_to" class="form-control" placeholder="" value="">
                 </div>
                 <div class="form-group my-3">
-                    <label for="document_ex"><strong>ไฟล์</strong></label>
-                    <input type="file" id="document_ex" name="document_ex" accept="document_ex/" class="form-control" placeholder="" value="">
+                    <label for="document_in"><strong>ไฟล์</strong></label>
+                    <input type="file" id="document_in" name="document_in" accept="document_ex/" class="form-control" placeholder="" value="">
                 </div>
                 <div class="from-group my-3">
                     <button type="submit" class="mt-3 btn btn-primary" name="submit_add" id="submit_add">Submit</button>
@@ -157,15 +157,15 @@ require 'adminnav.php';
     require '../conDB.php';
     if (isset($_POST['submit_add'])) {
         // รับข้อมูลจากฟอร์ม
-        $docex_number = $_POST['docex_number'];
+        $docin_number = $_POST['docin_number'];
         $type_id = $_POST['document_type'];
-        $docex_date = $_POST['docex_date'];
-        $docex_title = $_POST['docex_title'];
-        $docex_sent_from = $_POST['docex_sent_from'];
-        $docex_sent_to = $_POST['docex_sent_to'];
+        $docin_date = $_POST['docin_date'];
+        $docin_title = $_POST['docin_title'];
+        $docin_sent_from = $_POST['docin_sent_from'];
+        $docin_sent_to = $_POST['docin_sent_to'];
 
         // การอัปโหลดไฟล์
-        $target_dir = "../document_ex/"; // ปรับเส้นทางตามที่ต้องการ
+        $target_dir = "../document_in/"; // ปรับเส้นทางตามที่ต้องการ
 
         function createNewFileName($originalFileName)
         {
@@ -176,17 +176,17 @@ require 'adminnav.php';
 
 
         // ประมวลผลและย้ายไฟล์ทั้งหมด
-        $document_ex = $target_dir . createNewFileName($_FILES["document_ex"]["name"]);
-        move_uploaded_file($_FILES["document_ex"]["tmp_name"], $document_ex);
+        $document_in = $target_dir . createNewFileName($_FILES["document_in"]["name"]);
+        move_uploaded_file($_FILES["document_in"]["tmp_name"], $document_in);
         // ทำซ้ำสำหรับ car_picture2, car_picture3, และ car_picture4 ...
 
 
         // เพิ่มข้อมูลลงในฐานข้อมูล
 
-        $sql = "INSERT INTO ex_doc (docex_id, type_id, docex_number, docex_date, docex_title, 
-                docex_sent_from, docex_sent_to, document_ex, recording_date)
-                VALUES (NULL, '$type_id', '$docex_number', '$docex_date', '$docex_title',
-                '$docex_sent_from', '$docex_sent_to', '$document_ex', NOW())";
+        $sql = "INSERT INTO in_doc (docin_id, type_id, docin_number, docin_date, docin_title, 
+                docin_sent_from, docin_sent_to, document_in, recording_date)
+                VALUES (NULL, '$type_id', '$docin_number', '$docin_date', '$docin_title',
+                '$docin_sent_from', '$docin_sent_to', '$document_in', NOW())";
 
         // Execute SQL Query
         if ($con->query($sql) === TRUE) {
