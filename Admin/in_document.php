@@ -80,8 +80,6 @@ require 'adminnav.php';
         </table>
     </div>
 
-
-
     <div class="add-document" id="AddDocument">
         <div class="col-md-12">
             <div class="title-add">
@@ -90,126 +88,6 @@ require 'adminnav.php';
             <form action="in_document.php" method="POST" enctype="multipart/form-data">
                 <div class="form-group my-3">
                     <label for="docin_number"><strong>ที่</strong></label>
-                    <input type="text" id="docin_number" name="docin_number" class="form-control" placeholder="" value="">
-                </div>
-                <div class="form-group my-3">
-                    <strong>ชนิดเอกสาร</strong>
-                    <select name="document_type" id="document_type" class="form-select">
-
-                        <?php
-                        require '../conDB.php';
-
-                        // ดึงข้อมูลตำแหน่งจากฐานข้อมูล
-                        $sql = "SELECT * FROM document_type ORDER BY type_id";
-                        $result = mysqli_query($con, $sql);
-
-                        // นำข้อมูลมาใส่ในแท็ก <option>
-                        while ($row = mysqli_fetch_array($result)) {
-                            // ตรวจสอบว่าเป็น type id ที่ต้องการให้เป็นตัวเลือกแรกหรือไม่
-                            $selected = ($row['type_id'] == 2) ? 'selected' : '';
-                            echo "<option value='" . $row['type_id'] . "' $selected>" . $row['type_name'] . "</option>";
-                        }
-
-                        // ปิดการเชื่อมต่อฐานข้อมูล
-                        mysqli_close($con);
-                        ?>
-                    </select>
-                </div>
-                <div class="form-group my-3">
-                    <label for="docin_date"><strong>ลงวันที่</strong></label>
-                    <input type="date" id="docin_date" name="docin_date" class="form-control" placeholder="" value="">
-                </div>
-                <div class="form-group my-3">
-                    <label for="docin_title"><strong>เรื่อง</strong></label>
-                    <input type="text" id="docin_title" name="docin_title" class="form-control" placeholder="" value="">
-                </div>
-                <div class="form-group my-3">
-                    <label for="docin_sent_from"><strong>ส่งมาจาก</strong></label>
-                    <input type="text" id="docin_sent_from" name="docin_sent_from" class="form-control" placeholder="" value="">
-                </div>
-                <div class="form-group my-3">
-                    <label for="docin_sent_to"><strong>ถึง</strong></label>
-                    <input type="text" id="docin_sent_to" name="docin_sent_to" class="form-control" placeholder="" value="">
-                </div>
-                <div class="form-group my-3">
-                    <label for="document_in"><strong>ไฟล์</strong></label>
-                    <input type="file" id="document_in" name="document_in" accept="document_ex/" class="form-control" placeholder="" value="">
-                </div>
-                <div class="from-group my-3">
-                    <button type="submit" class="mt-3 btn btn-primary" name="submit_add" id="submit_add">Submit</button>
-                    <button onclick="hideAdd()" id="close_add" class="mt-3 btn btn-danger">Close</button>
-                </div>
-        </div>
-    </div>
-    <script>
-        function AddDocument() {
-            var popup = document.getElementById("AddDocument");
-            popup.style.display = "block";
-        }
-
-        function hideAdd() {
-            var popup = document.getElementById("AddDocument");
-            popup.style.display = "none";
-        }
-    </script>
-
-    <?php
-    require '../conDB.php';
-    if (isset($_POST['submit_add'])) {
-        // รับข้อมูลจากฟอร์ม
-        $docin_number = $_POST['docin_number'];
-        $type_id = $_POST['document_type'];
-        $docin_date = $_POST['docin_date'];
-        $docin_title = $_POST['docin_title'];
-        $docin_sent_from = $_POST['docin_sent_from'];
-        $docin_sent_to = $_POST['docin_sent_to'];
-
-        // การอัปโหลดไฟล์
-        $target_dir = "../document_in/"; // ปรับเส้นทางตามที่ต้องการ
-
-        function createNewFileName($originalFileName)
-        {
-            $fileExtension = pathinfo($originalFileName, PATHINFO_EXTENSION);
-            $newFileName = "docex_" . rand(1000, 999999) . "." . $fileExtension; // สร้างชื่อไฟล์แบบไม่ซ้ำ
-            return $newFileName;
-        }
-
-
-        // ประมวลผลและย้ายไฟล์ทั้งหมด
-        $document_in = $target_dir . createNewFileName($_FILES["document_in"]["name"]);
-        move_uploaded_file($_FILES["document_in"]["tmp_name"], $document_in);
-        // ทำซ้ำสำหรับ car_picture2, car_picture3, และ car_picture4 ...
-
-
-        // เพิ่มข้อมูลลงในฐานข้อมูล
-
-        $sql = "INSERT INTO in_doc (docin_id, type_id, docin_number, docin_date, docin_title, 
-                docin_sent_from, docin_sent_to, document_in, recording_date)
-                VALUES (NULL, '$type_id', '$docin_number', '$docin_date', '$docin_title',
-                '$docin_sent_from', '$docin_sent_to', '$document_in', NOW())";
-
-        // Execute SQL Query
-        if ($con->query($sql) === TRUE) {
-            echo '<script>window.location.href = window.location.href;</script>';
-        } else {
-            echo "Error: " . $sql . "<br>" . $con->error;
-        }
-    }
-    $con->close();
-    ?>
-    <!-- end add function -->
-
-    <!-- function edit -->
-
-    <div class="edit-document" id="EditDocument">
-        <div class="col-md-12">
-            <div class="title-edit">
-                แก้ไขเอกสารบันทึกข้อความ
-            </div>
-            <form action="in_document.php" method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="docin_id" id="edit_docin_id" value="">
-                <div class="form-group my-3">
-                    <label for="docex_number"><strong>ที่</strong></label>
                     <input type="text" id="docin_number" name="docin_number" class="form-control" placeholder="" value="">
                 </div>
                 <div class="form-group my-3">
@@ -235,7 +113,7 @@ require 'adminnav.php';
                 </div>
                 <div class="form-group my-3">
                     <label for="docin_date"><strong>ลงวันที่</strong></label>
-                    <input type="date" id="docin_date" name="docin_date" class="form-control" placeholder="" value="">
+                    <input type="date" id="docin_date_add" name="docin_date" class="form-control" placeholder="" value="">
                 </div>
                 <div class="form-group my-3">
                     <label for="docin_title"><strong>เรื่อง</strong></label>
@@ -254,40 +132,207 @@ require 'adminnav.php';
                     <input type="file" id="document_in" name="document_in" accept="document_in/" class="form-control" placeholder="" value="">
                 </div>
                 <div class="from-group my-3">
-                    <button type="submit" class="mt-3 btn btn-primary" name="SubmitEdit" id="submit_edit">Submit</button>
+                    <button type="submit" class="mt-3 btn btn-primary" name="SubmitAdd" id="SubmitAdd">Submit</button>
                     <button onclick="hideEdit()" id="close_add" class="mt-3 btn btn-danger">Close</button>
                 </div>
         </div>
     </div>
-
-    <!-- script -->
     <script>
-        function Edit(docin_id, docin_number, docin_date, docin_title, docin_sent_from, docin_sent_to) {
-            var edit = document.getElementById("EditDocument");
-            var InputDocinID = edit.querySelector("input[name='docin_id']");
-            var InputDocinNumber = edit.querySelector("input[name='docin_number']");
-            var InputDocinDate = edit.querySelector("input[name='docin_date']");
-            var InputDocinTitle = edit.querySelector("input[name='docin_title']");
-            var InputDocinSentFrom = edit.querySelector("input[name='docin_sent_from']");
-            var InputDocinSentTo = edit.querySelector("input[name='docin_sent_to']");
-
-
-            InputDocinID.value = docin_id;
-            InputDocinNumber.value = docin_number;
-            InputDocinDate.value = docin_date;
-            InputDocinTitle.value = docin_title;
-            InputDocinSentFrom.value = docin_sent_from;
-            InputDocinSentTo.value = docin_sent_to;
-
-            // Display the edit popup
-            edit.style.display = "block";
+        function AddDocument() {
+            var popup = document.getElementById("AddDocument");
+            popup.style.display = "block";
         }
 
-        function hideEdit() {
-            var edit = document.getElementById("EditDocument");
-            edit.style.display = "none";
+        function hideAdd() {
+            var popup = document.getElementById("AddDocument");
+            popup.style.display = "none";
         }
     </script>
+
+    <?php
+    require '../conDB.php';
+    if (isset($_POST['SubmitAdd'])) {
+        // รับข้อมูลจากฟอร์ม
+        $docin_number = $_POST['docin_number'];
+        $type_id = $_POST['document_type'];
+        $docin_date = $_POST['docin_date'];
+        $docin_title = $_POST['docin_title'];
+        $docin_sent_from = $_POST['docin_sent_from'];
+        $docin_sent_to = $_POST['docin_sent_to'];
+
+        // การอัปโหลดไฟล์
+        $target_dir = "../document_in/"; // ปรับเส้นทางตามที่ต้องการ
+
+        function createNewFileName($originalFileName)
+        {
+            $fileExtension = pathinfo($originalFileName, PATHINFO_EXTENSION);
+            $newFileName = "docin_" . rand(1000, 999999) . "." . $fileExtension; // สร้างชื่อไฟล์แบบไม่ซ้ำ
+            return $newFileName;
+        }
+
+
+        // ประมวลผลและย้ายไฟล์ทั้งหมด
+        $document_in = $target_dir . createNewFileName($_FILES["document_in"]["name"]);
+        move_uploaded_file($_FILES["document_in"]["tmp_name"], $document_in);
+
+
+
+        // เพิ่มข้อมูลลงในฐานข้อมูล
+
+        $sql = "INSERT INTO in_doc (docin_id, type_id, docin_number, docin_date, docin_title, 
+                docin_sent_from, docin_sent_to, document_in, recording_date)
+                VALUES (NULL, '$type_id', '$docin_number', '$docin_date', '$docin_title',
+                '$docin_sent_from', '$docin_sent_to', '$document_in', NOW())";
+
+        // Execute SQL Query
+        if ($con->query($sql) === TRUE) {
+            echo '<script>window.location.href = window.location.href;</script>';
+        } else {
+            echo "Error: " . $sql . "<br>" . $con->error;
+        }
+    }
+    $con->close();
+    ?>
+
+
+    <div class="update-document" id="UpdateDocument">
+        <div class="col-md-12">
+            <div class="title-update">
+                แก้ไขเอกสารบันทึกข้อความ
+            </div>
+            <form action="in_document.php" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="update_docin_id" id="update_docin_id" placeholder="" value="">
+                <div class="form-group my-3">
+                    <label for="update_docin_number"><strong>ที่</strong></label>
+                    <input type="text" id="update_docin_number" name="update_docin_number" class="form-control" placeholder="" value="">
+                </div>
+                <div class="form-group my-3">
+                    <strong>ชนิดเอกสาร</strong>
+                    <select name="update_document_type" id="update_document_type" class="form-select">
+
+                        <?php
+                        require '../conDB.php';
+
+                        // ดึงข้อมูลตำแหน่งจากฐานข้อมูล
+                        $sql = "SELECT * FROM document_type ORDER BY type_id";
+                        $result = mysqli_query($con, $sql);
+
+                        // นำข้อมูลมาใส่ในแท็ก <option>
+                        while ($row = mysqli_fetch_array($result)) {
+                            echo "<option value='" . $row['type_id'] . "'>" . $row['type_name'] . "</option>";
+                        }
+
+                        // ปิดการเชื่อมต่อฐานข้อมูล
+                        mysqli_close($con);
+                        ?>
+                    </select>
+                </div>
+                <div class="form-group my-3">
+                    <label for="update_docin_date"><strong>วันที่</strong></label>
+                    <input type="date" id="update_docin_date" name="update_docin_date" class="form-control" placeholder="" value="">
+                </div>
+                <div class="form-group my-3">
+                    <label for="update_docin_title"><strong>เรื่อง</strong></label>
+                    <input type="text" id="update_docin_title" name="update_docin_title" class="form-control" placeholder="" value="">
+                </div>
+                <div class="form-group my-3">
+                    <label for="update_docin_sent_from"><strong>ส่งมาจาก</strong></label>
+                    <input type="text" id="update_docin_sent_from" name="update_docin_sent_from" class="form-control" placeholder="" value="">
+                </div>
+                <div class="form-group my-3">
+                    <label for="update_docin_sent_to"><strong>ถึง</strong></label>
+                    <input type="text" id="update_docin_sent_to" name="update_docin_sent_to" class="form-control" placeholder="" value="">
+                </div>
+                <div class="form-group my-3">
+                    <label for="update_document_in"><strong>ไฟล์</strong></label>
+                    <input type="file" id="update_document_in" name="update_document_in" class="form-control" placeholder="" value="">
+                </div>
+                <div class="from-group my-3">
+                    <button type="submit" class="mt-3 btn btn-primary" name="SubmitUpdate" id="SubmitUpdate">Update</button>
+                    <button onclick="hideUpdate()" id="close_update" class="mt-3 btn btn-danger">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        function Edit(docin_id, docin_number, docin_date, docin_title, docin_sent_from, docin_sent_to) {
+            // นำข้อมูลที่ต้องการแก้ไขมาใส่ใน input fields ของหน้าต่างแก้ไข
+            document.getElementById("update_docin_id").value = docin_id;
+            document.getElementById("update_docin_number").value = docin_number;
+            document.getElementById("update_docin_date").value = docin_date;
+            document.getElementById("update_docin_title").value = docin_title;
+            document.getElementById("update_docin_sent_from").value = docin_sent_from;
+            document.getElementById("update_docin_sent_to").value = docin_sent_to;
+
+            // แสดงหน้าต่างแก้ไข
+            var updatePopup = document.getElementById("UpdateDocument");
+            updatePopup.style.display = "block";
+        }
+
+        function hideUpdate() {
+            var updatePopup = document.getElementById("UpdateDocument");
+            updatePopup.style.display = "none";
+        }
+    </script>
+    <?php
+    require '../conDB.php';
+
+    if (isset($_POST['SubmitUpdate'])) {
+        // รับข้อมูลที่ต้องการอัปเดต
+        $update_docin_id = $_POST['update_docin_id'];
+        $update_docin_number = $_POST['update_docin_number'];
+        $update_docin_date = $_POST['update_docin_date'];
+        $update_docin_title = $_POST['update_docin_title'];
+        $update_docin_sent_from = $_POST['update_docin_sent_from'];
+        $update_docin_sent_to = $_POST['update_docin_sent_to'];
+
+        // ลบไฟล์เก่า
+        $sql_select_old_file = "SELECT document_in FROM in_doc WHERE docin_id = ?";
+        $stmt = $con->prepare($sql_select_old_file);
+        $stmt->bind_param("i", $update_docin_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $old_file_path = "../document_in/" . $row['document_in'];
+            unlink($old_file_path); // ลบไฟล์เก่า
+        }
+
+        // ตรวจสอบการอัปโหลดไฟล์ใหม่
+        if ($_FILES['update_document_in']['size'] > 0) {
+            $target_dir = "../document_in/";
+            $new_file_name = basename($_FILES["update_document_in"]["name"]);
+            $document_in = $target_dir . $new_file_name;
+            move_uploaded_file($_FILES["update_document_in"]["tmp_name"], $document_in);
+        } else {
+            $document_in = ''; // ถ้าไม่มีการอัปโหลดไฟล์ใหม่ให้เป็นค่าว่าง
+        }
+
+        // อัปเดตข้อมูลในฐานข้อมูล
+        $sql_update = "UPDATE in_doc SET 
+    docin_number = ?, 
+    docin_date = ?, 
+    docin_title = ?, 
+    docin_sent_from = ?, 
+    docin_sent_to = ?, 
+    document_in = ?, 
+    recording_date = NOW() 
+    WHERE docin_id = ?";
+        $stmt = $con->prepare($sql_update);
+        $stmt->bind_param("ssssssi", $update_docin_number, $update_docin_date, $update_docin_title, $update_docin_sent_from, $update_docin_sent_to, $document_in, $update_docin_id);
+
+        // ประมวลผลคำสั่ง SQL
+        if ($stmt->execute()) {
+            // หากอัปเดตข้อมูลสำเร็จ ให้กลับไปยังหน้าเว็บไซต์ที่มีรายการเอกสารอยู่
+            echo '<script>window.location.href = window.location.href;</script>';
+            exit;
+        } else {
+            // หากมีข้อผิดพลาดในการอัปเดต แสดงข้อความข้อผิดพลาด
+            echo "Error updating record: " . $con->error;
+        }
+    }
+    ?>
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
