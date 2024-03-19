@@ -10,7 +10,7 @@ if (isset($_POST['docex_id'])) {
 
     // เตรียมคำสั่ง SQL และผูกค่า parameter
     $stmt = $con->prepare($sql_delete);
-    $stmt->bind_param("i", $docin_id);
+    $stmt->bind_param("i", $docex_id);
 
     // ประมวลผลคำสั่ง SQL
     if ($stmt->execute()) {

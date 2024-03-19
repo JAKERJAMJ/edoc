@@ -70,7 +70,7 @@ require 'adminnav.php';
                 echo '<td>';
                 echo '<button type="button" class="btn btn-warning mr-2" onclick="Edit(' . $row['docex_id'] . ', \'' . $row['docex_number'] . '\', \'' . $row['docex_date'] . '\', \'' . $row['docex_title'] . '\', \'' . $row['docex_sent_from'] . '\', \'' . $row['docex_sent_to'] . '\')">แก้ไข</button>';
                 echo '&nbsp;';
-                echo '<button type="button" class="btn btn-danger" onclick="deleteIExdoc(' . $row['docin_id'] . ')">ลบ</button> ';
+                echo '<button type="button" class="btn btn-danger" onclick="deleteExdoc(' . $row['docex_id'] . ')">ลบ</button> ';
                 echo '</td>';
                 echo "</tr>";
 
@@ -337,17 +337,22 @@ require 'adminnav.php';
     <!-- delete function -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-    function deleteExdoc(docex_id) {
-        if (confirm("คุณต้องการลบรายการนี้ใช่หรือไม่?")) {
-            // ส่งคำร้องขอ AJAX ไปยังไฟล์ PHP เพื่อลบข้อมูล
-            $.post("docex_delete.php", { docex_id: docex_id })
-                .done(function(data) {
-                    // เมื่อลบข้อมูลเสร็จสิ้น รีโหลดหน้าเว็บ
-                    window.location.reload();
-                });
+        function deleteExdoc(docex_id) {
+            if (confirm("คุณต้องการลบรายการนี้ใช่หรือไม่?")) {
+                // ส่งคำร้องขอ AJAX ไปยังไฟล์ PHP เพื่อลบข้อมูล
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "docex_delete.php", true);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xhr.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        // เมื่อลบข้อมูลเสร็จสิ้น รีโหลดหน้าเว็บ
+                        window.location.reload();
+                    }
+                };
+                xhr.send("docex_id=" + docex_id);
+            }
         }
-    }
-</script>
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>

@@ -351,6 +351,7 @@ require 'adminnav.php';
             }
         }
     </script>
+    <!-- end delete function -->
 
 
 
