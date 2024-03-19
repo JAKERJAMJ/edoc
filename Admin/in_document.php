@@ -48,17 +48,17 @@ require 'adminnav.php';
             require '../conDB.php';
 
             $sql = "SELECT in_doc.docin_id, in_doc.docin_number, in_doc.docin_date, in_doc.docin_title, in_doc.docin_sent_from, in_doc.docin_sent_to, in_doc.document_in, 
-                    in_doc.recording_date, document_type.type_name
-                    FROM in_doc
-                    LEFT JOIN document_type ON in_doc.type_id = document_type.type_id
-                    ORDER BY in_doc.docin_id";
+        in_doc.recording_date, document_type.type_name
+        FROM in_doc
+        LEFT JOIN document_type ON in_doc.type_id = document_type.type_id
+        ORDER BY in_doc.docin_id DESC"; // เรียงจากใหม่สุดไปเก่าที่สุด
 
             $result = mysqli_query($con, $sql);
-            $counter = 1;
-            // สมมติว่าคอลัมน์ 'status' เก็บข้อมูลสถานะ
+            $counter = mysqli_num_rows($result); // นับจำนวนแถวทั้งหมดในผลลัพธ์
+
             while ($row = mysqli_fetch_array($result)) {
                 echo "<tr>";
-                echo "<td>" . $counter . "</td>";
+                echo "<td>" . $counter . "</td>"; // ใช้ค่า $counter ที่ถูกนับลำดับแล้ว
                 echo "<td>" . $row['docin_number'] . "</td>";
                 echo "<td>" . date('d/m/Y', strtotime($row['docin_date'])) . "</td>";
                 echo "<td>" . $row['docin_title'] . "</td>";
@@ -74,8 +74,9 @@ require 'adminnav.php';
                 echo '</td>';
                 echo "</tr>";
 
-                $counter++;
+                $counter--; // ลดค่า $counter ลงทีละหนึ่งเพื่อแสดงลำดับที่ถูกต้อง
             }
+
             ?>
         </table>
     </div>
