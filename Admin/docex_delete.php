@@ -1,12 +1,12 @@
 <?php
 require '../conDB.php';
 
-if (isset($_POST['docin_id'])) {
+if (isset($_POST['docex_id'])) {
     // รับค่า docin_id ที่ต้องการลบ
-    $docin_id = $_POST['docin_id'];
+    $docex_id = $_POST['docex_id'];
 
     // เขียนคำสั่ง SQL สำหรับลบข้อมูล
-    $sql_delete = "DELETE FROM in_doc WHERE docin_id = ?";
+    $sql_delete = "DELETE FROM ex_doc WHERE docex_id = ?";
 
     // เตรียมคำสั่ง SQL และผูกค่า parameter
     $stmt = $con->prepare($sql_delete);

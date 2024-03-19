@@ -13,12 +13,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="#">Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Features</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Pricing</a>
-                    </li>
                 </ul>
                 <?php if ($current_page != 'login.php'): ?>
                     <a href="login.php"><button type="button" class="btn btn-primary">Login</button></a>

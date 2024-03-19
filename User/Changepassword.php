@@ -48,12 +48,12 @@
             $result = mysqli_query($con, $query);
     
             if ($result) {
-                echo "<script>alert ('อัพเดทรหัสผ่านเรียบร้อย')</script>";
+                echo "<script>alert ('อัพเดทรหัสผ่านเรียบร้อย');</script>";
             } else {
-                echo "เกิดข้อผิดพลาดในการอัพเดทรหัสผ่าน";
+                echo "<script>alert ('เกิดข้อผิดพลาดในการอัพเดทรหัสผ่าน')</script>";
             }
         } else {
-            echo "รหัสผ่านใหม่และการยืนยันรหัสผ่านไม่ตรงกัน";
+            echo "<script>alert ('รหัสผ่านใหม่และการยืนยันรหัสผ่านไม่ตรงกัน')</script>";
         }
     }
     ?>

@@ -70,7 +70,7 @@ require 'adminnav.php';
                 echo '<td>';
                 echo '<button type="button" class="btn btn-warning mr-2" onclick="Edit(' . $row['docin_id'] . ', \'' . $row['docin_number'] . '\', \'' . $row['docin_date'] . '\', \'' . $row['docin_title'] . '\', \'' . $row['docin_sent_from'] . '\', \'' . $row['docin_sent_to'] . '\')">แก้ไข</button>';
                 echo '&nbsp;';
-                echo '<button type="button" class="btn btn-danger onclick="deleteIndoc(' . $row['docin_id'] . ')"">ลบ</button>';
+                echo '<button type="button" class="btn btn-danger" onclick="deleteIndoc(' . $row['docin_id'] . ')">ลบ</button> ';
                 echo '</td>';
                 echo "</tr>";
 
@@ -331,24 +331,25 @@ require 'adminnav.php';
 
     <!-- end edit function -->
 
-   <!-- delete function -->
-<script>
-    function deleteIndoc(docin_id) {
-        if (confirm("คุณต้องการลบรายการนี้ใช่หรือไม่?")) {
-            // ส่งคำร้องขอ AJAX ไปยังไฟล์ PHP เพื่อลบข้อมูล
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "docin_delete.php", true);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            xhr.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                    // เมื่อลบข้อมูลเสร็จสิ้น รีโหลดหน้าเว็บ
-                    window.location.reload();
-                }
-            };
-            xhr.send("docin_id=" + docin_id);
+    <!-- delete function -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function deleteIndoc(docin_id) {
+            if (confirm("คุณต้องการลบรายการนี้ใช่หรือไม่?")) {
+                // ส่งคำร้องขอ AJAX ไปยังไฟล์ PHP เพื่อลบข้อมูล
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "docin_delete.php", true);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xhr.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        // เมื่อลบข้อมูลเสร็จสิ้น รีโหลดหน้าเว็บ
+                        window.location.reload();
+                    }
+                };
+                xhr.send("docin_id=" + docin_id);
+            }
         }
-    }
-</script>
+    </script>
 
 
 
