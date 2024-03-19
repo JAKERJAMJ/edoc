@@ -70,7 +70,7 @@ require 'adminnav.php';
                 echo '<td>';
                 echo '<button type="button" class="btn btn-warning mr-2" onclick="Edit(' . $row['docin_id'] . ', \'' . $row['docin_number'] . '\', \'' . $row['docin_date'] . '\', \'' . $row['docin_title'] . '\', \'' . $row['docin_sent_from'] . '\', \'' . $row['docin_sent_to'] . '\')">แก้ไข</button>';
                 echo '&nbsp;';
-                echo '<button type="button" class="btn btn-danger">ลบ</button>';
+                echo '<button type="button" class="btn btn-danger onclick="deleteIndoc(' . $row['docin_id'] . ')"">ลบ</button>';
                 echo '</td>';
                 echo "</tr>";
 
@@ -286,39 +286,33 @@ require 'adminnav.php';
         $update_docin_sent_from = $_POST['update_docin_sent_from'];
         $update_docin_sent_to = $_POST['update_docin_sent_to'];
 
-        // ลบไฟล์เก่า
-        $sql_select_old_file = "SELECT document_in FROM in_doc WHERE docin_id = ?";
-        $stmt = $con->prepare($sql_select_old_file);
-        $stmt->bind_param("i", $update_docin_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
 
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $old_file_path = "../document_in/" . $row['document_in'];
-            unlink($old_file_path); // ลบไฟล์เก่า
+
+        function createNewFileName($originalFileName)
+        {
+            $fileExtension = pathinfo($originalFileName, PATHINFO_EXTENSION);
+            $newFileName = "docin_" . rand(1000, 999999) . "." . $fileExtension; // สร้างชื่อไฟล์ใหม่
+            return $newFileName;
         }
 
-        // ตรวจสอบการอัปโหลดไฟล์ใหม่
-        if ($_FILES['update_document_in']['size'] > 0) {
-            $target_dir = "../document_in/";
-            $new_file_name = basename($_FILES["update_document_in"]["name"]);
-            $document_in = $target_dir . $new_file_name;
-            move_uploaded_file($_FILES["update_document_in"]["tmp_name"], $document_in);
-        } else {
-            $document_in = ''; // ถ้าไม่มีการอัปโหลดไฟล์ใหม่ให้เป็นค่าว่าง
-        }
+        // การอัปโหลดไฟล์ใหม่
+        $target_dir = "../document_in/"; // เปลี่ยนตามตำแหน่งที่คุณต้องการ
+        $newFileName = createNewFileName($_FILES["update_document_in"]["name"]); // สร้างชื่อไฟล์ใหม่
+        $document_in = $target_dir . $newFileName; // เตรียมตำแหน่งของไฟล์ใหม่
+
+        move_uploaded_file($_FILES["update_document_in"]["tmp_name"], $document_in); // ย้ายไฟล์ไปยังตำแหน่งใหม่
+
 
         // อัปเดตข้อมูลในฐานข้อมูล
         $sql_update = "UPDATE in_doc SET 
-    docin_number = ?, 
-    docin_date = ?, 
-    docin_title = ?, 
-    docin_sent_from = ?, 
-    docin_sent_to = ?, 
-    document_in = ?, 
-    recording_date = NOW() 
-    WHERE docin_id = ?";
+        docin_number = ?, 
+        docin_date = ?, 
+        docin_title = ?, 
+        docin_sent_from = ?, 
+        docin_sent_to = ?, 
+        document_in = ?, 
+        recording_date = NOW() 
+        WHERE docin_id = ?";
         $stmt = $con->prepare($sql_update);
         $stmt->bind_param("ssssssi", $update_docin_number, $update_docin_date, $update_docin_title, $update_docin_sent_from, $update_docin_sent_to, $document_in, $update_docin_id);
 
@@ -332,7 +326,30 @@ require 'adminnav.php';
             echo "Error updating record: " . $con->error;
         }
     }
+
     ?>
+
+    <!-- end edit function -->
+
+   <!-- delete function -->
+<script>
+    function deleteIndoc(docin_id) {
+        if (confirm("คุณต้องการลบรายการนี้ใช่หรือไม่?")) {
+            // ส่งคำร้องขอ AJAX ไปยังไฟล์ PHP เพื่อลบข้อมูล
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "docin_delete.php", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    // เมื่อลบข้อมูลเสร็จสิ้น รีโหลดหน้าเว็บ
+                    window.location.reload();
+                }
+            };
+            xhr.send("docin_id=" + docin_id);
+        }
+    }
+</script>
+
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

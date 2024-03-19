@@ -68,7 +68,7 @@ require 'adminnav.php';
                 echo '<td><button type="button" class="btn btn-secondary">สถานะ</button></td>';
                 echo "<td>" . date('d/m/Y H:i:s', strtotime($row['recording_date'])) . "</td>";
                 echo '<td>';
-                echo '<button type="button" class="btn btn-warning mr-2" onclick=EditDocument('.$row['docex_id'].')>แก้ไข</button>';
+                echo '<button type="button" class="btn btn-warning mr-2" onclick="Edit(' . $row['docex_id'] . ', \'' . $row['docex_number'] . '\', \'' . $row['docex_date'] . '\', \'' . $row['docex_title'] . '\', \'' . $row['docex_sent_from'] . '\', \'' . $row['docex_sent_to'] . '\')">แก้ไข</button>';
                 echo '&nbsp;';
                 echo '<button type="button" class="btn btn-danger">ลบ</button>';
                 echo '</td>';
@@ -198,22 +198,20 @@ require 'adminnav.php';
 
     <!-- edit function -->
 
-    <div class="edit-document" id="EditDocument">
+    <div class="update-document" id="UpdateDocument">
         <div class="col-md-12">
-            <div class="title-edit">
-                แก้ไขข้อมูลเอกสาร
+            <div class="title-update">
+                แก้ไขเอกสารภายนอก
             </div>
             <form action="ex_document.php" method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="docin_id" id="edit_docin_id" value="">
+                <input type="hidden" name="update_docex_id" id="update_docex_id" placeholder="" value="">
                 <div class="form-group my-3">
-                    <label for="docin_number"><strong>ที่</strong></label>
-                    <input type="text" id="docin_number" name="docin_number" class="form-control" placeholder="" value="">
-                    <input type="hidden" name="docin_number" id="edit_docin_number" value="">
+                    <label for="update_docex_number"><strong>ที่</strong></label>
+                    <input type="text" id="update_docex_number" name="update_docex_number" class="form-control" placeholder="" value="">
                 </div>
                 <div class="form-group my-3">
                     <strong>ชนิดเอกสาร</strong>
-                    <input type="hidden" name="document_type" id="edit_document_type" value="">
-                    <select name="document_type" id="document_type" class="form-select">
+                    <select name="update_document_type" id="update_document_type" class="form-select">
 
                         <?php
                         require '../conDB.php';
@@ -224,9 +222,7 @@ require 'adminnav.php';
 
                         // นำข้อมูลมาใส่ในแท็ก <option>
                         while ($row = mysqli_fetch_array($result)) {
-                            // ตรวจสอบว่าเป็น type id ที่ต้องการให้เป็นตัวเลือกแรกหรือไม่
-                            $selected = ($row['type_id'] == 2) ? 'selected' : '';
-                            echo "<option value='" . $row['type_id'] . "' $selected>" . $row['type_name'] . "</option>";
+                            echo "<option value='" . $row['type_id'] . "'>" . $row['type_name'] . "</option>";
                         }
 
                         // ปิดการเชื่อมต่อฐานข้อมูล
@@ -235,49 +231,51 @@ require 'adminnav.php';
                     </select>
                 </div>
                 <div class="form-group my-3">
-                    <label for="docin_date"><strong>ลงวันที่</strong></label>
-                    <input type="date" name="docin_date" class="form-control" placeholder="" value="">
-                    <input type="hidden" name="edit_email" id="edit_email" value="">
+                    <label for="update_docex_date"><strong>วันที่</strong></label>
+                    <input type="date" id="update_docex_date" name="update_docex_date" class="form-control" placeholder="" value="">
                 </div>
                 <div class="form-group my-3">
-                    <label for="docin_title"><strong>เรื่อง</strong></label>
-                    <input type="text" name="docin_title" class="form-control" placeholder="" value="">
-                    <input type="hidden" name="docin_title" id="edit_docin_title" value="">
-                </div>
-
-                <div class="form-group my-3">
-                    <label for="docin_sent_from"><strong>ส่งมาจาก</strong></label>
-                    <input type="text" name="docin_sent_from" class="form-control" placeholder="" value="">
-                    <input type="hidden" name="docin_sent_from" id="edit_docin_sent_from" value="">
+                    <label for="update_docex_title"><strong>เรื่อง</strong></label>
+                    <input type="text" id="update_docex_title" name="update_docex_title" class="form-control" placeholder="" value="">
                 </div>
                 <div class="form-group my-3">
-                    <label for="docin_sent_to"><strong>ถึง</strong></label>
-                    <input type="text" name="docin_sent_to" class="form-control" placeholder="" value="">
-                    <input type="hidden" name="docin_sent_to" id="edit_docin_sent_to" value="">
-
+                    <label for="update_docex_sent_from"><strong>ส่งมาจาก</strong></label>
+                    <input type="text" id="update_docex_sent_from" name="update_docex_sent_from" class="form-control" placeholder="" value="">
                 </div>
                 <div class="form-group my-3">
-                    <label for="document_in"><strong>ไฟล์</strong></label>
-                    <input type="file" id="document_in" name="document_in" accept="document_in/" class="form-control" placeholder="" value="">
+                    <label for="update_docex_sent_to"><strong>ถึง</strong></label>
+                    <input type="text" id="update_docex_sent_to" name="update_docex_sent_to" class="form-control" placeholder="" value="">
                 </div>
                 <div class="form-group my-3">
-                    <button type="submit" class="mt-3 btn btn-primary" name="submitEdit" id="submit">Submit</button>
-                    <button type="button" onclick="hideEditDocument()" id="close_edit" class="mt-3 btn btn-danger">Close</button>
+                    <label for="update_document_ex"><strong>ไฟล์</strong></label>
+                    <input type="file" id="update_document_ex" name="update_document_ex" class="form-control" placeholder="" value="">
+                </div>
+                <div class="from-group my-3">
+                    <button type="submit" class="mt-3 btn btn-primary" name="SubmitUpdate" id="SubmitUpdate">Update</button>
+                    <button onclick="hideUpdate()" id="close_update" class="mt-3 btn btn-danger">Close</button>
                 </div>
             </form>
         </div>
     </div>
-
     <script>
-        function EditDocument() {
-            var popup = document.getElementById("EditDocument");
-            popup.style.display = "block";
-        }
-        function hideEditDocument() {
-            var popup = document.getElementById("EditDocument");
-            popup.style.display = "none";
+        function Edit(docex_id, docex_number, docex_date, docex_title, docex_sent_from, docex_sent_to) {
+            // นำข้อมูลที่ต้องการแก้ไขมาใส่ใน input fields ของหน้าต่างแก้ไข
+            document.getElementById("update_docex_id").value = docex_id;
+            document.getElementById("update_docex_number").value = docex_number;
+            document.getElementById("update_docex_date").value = docex_date;
+            document.getElementById("update_docex_title").value = docex_title;
+            document.getElementById("update_docex_sent_from").value = docex_sent_from;
+            document.getElementById("update_docex_sent_to").value = docex_sent_to;
+
+            // แสดงหน้าต่างแก้ไข
+            var updatePopup = document.getElementById("UpdateDocument");
+            updatePopup.style.display = "block";
         }
 
+        function hideUpdate() {
+            var updatePopup = document.getElementById("UpdateDocument");
+            updatePopup.style.display = "none";
+        }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
