@@ -39,9 +39,9 @@ require 'adminnav.php';
                 <th width="130px">ส่งมาจาก</th>
                 <th width="100px">ถึง</th>
                 <th width="120px">ไฟล์เอกสาร</th>
-                <th width="100px">สถานนะ</th>
+                <th width="170px">สถานนะ</th>
                 <th width="100px">วันที่บันทึก</th>
-                <th width="300px">Action</th>
+                <th width="200px">Action</th>
 
             </tr>
             <?php
@@ -65,7 +65,7 @@ require 'adminnav.php';
                 echo "<td>" . $row['docin_sent_from'] . "</td>";
                 echo "<td>" . $row['docin_sent_to'] . "</td>";
                 echo "<td><a href='" . $row['document_in'] . "' download>ดาวน์โหลด</a></td>";
-                echo '<td><button type="button" class="btn btn-secondary">สถานะ</button></td>';
+                echo '<td><button type="button" class="btn btn-warning btn-sm" onclick="Status(' . $row['docin_id'] . ')">กำลังดำเนินการ</button></td>';
                 echo "<td>" . date('d/m/Y H:i:s', strtotime($row['recording_date'])) . "</td>";
                 echo '<td>';
                 echo '<button type="button" class="btn btn-warning mr-2" onclick="Edit(' . $row['docin_id'] . ', \'' . $row['docin_number'] . '\', \'' . $row['docin_date'] . '\', \'' . $row['docin_title'] . '\', \'' . $row['docin_sent_from'] . '\', \'' . $row['docin_sent_to'] . '\')">แก้ไข</button>';
@@ -354,6 +354,137 @@ require 'adminnav.php';
     <!-- end delete function -->
 
 
+    <div class="status" id="Status">
+        <button type="button" class="close" aria-label="Close" onclick="CloseStatus()">X</button>
+        <div class="title-status">สถานะ</div>
+        <form action="in_document.php" enctype="multipart/form-data">
+            <select class="form-select mt-3" id="SelectStatus" onchange="Status()">
+                <option selected>กำลังดำเนินการ</option>
+                <option value="1">รับทราบ</option>
+                <option value="2">รับทราบ : ดำเนินการต่อ</option>
+            </select>
+            <select class="form-select mt-3" id="SelectSendto" onchange="StatusSendto()" style="display: none;">
+                <option selected>ต้องการส่งเอกสารให้</option>
+                <option value="1">รายบุคคล</option>
+                <option value="2">แผนก</option>
+            </select>
+            <div class="form-check mt-2" id="UserCheckbox" style="display: none;">
+                <?php
+                require '../conDB.php';
+
+                // ดึงข้อมูลผู้ใช้จากฐานข้อมูล
+                $sql = "SELECT * FROM user ORDER BY user_id";
+                $result = mysqli_query($con, $sql);
+
+                // นำข้อมูลมาใส่ใน checkbox
+                while ($row = mysqli_fetch_array($result)) {
+                    $selected = ''; // เพิ่มตัวแปรเพื่อเก็บค่า selected
+                    if ($row['user_id'] == $user_user) { // อาจเกิดปัญหาที่นี่เนื่องจากตัวแปร $user_user ไม่ได้ถูกกำหนดค่า
+                        $selected = 'checked'; // ถ้า user_id ตรงกับค่า user_user ให้กำหนด checked
+                    }
+                    echo "<input class='form-check-input' type='checkbox' name='users[]' id='user_" . $row['user_id'] . "' value='" . $row['user_id'] . "' $selected>";
+                    echo "<label class='form-check-label' for='user_" . $row['user_id'] . "'>" . $row['name_user'] . "</label><br>";
+                }
+
+                // ปิดการเชื่อมต่อฐานข้อมูล
+                mysqli_close($con);
+                ?>
+            </div>
+
+            <div class="form-check mt-2" id="DepartmentCheckbox" style="display: none;">
+                <?php
+                require '../conDB.php';
+
+                // ดึงข้อมูลตำแหน่งจากฐานข้อมูล
+                $sql = "SELECT * FROM department ORDER BY de_id";
+                $result = mysqli_query($con, $sql);
+
+                // นำข้อมูลมาใส่ใน checkbox
+                while ($row = mysqli_fetch_array($result)) {
+                    $selected = ''; // เพิ่มตัวแปรเพื่อเก็บค่า selected
+                    if ($row['de_id'] == $user_department) {
+                        $selected = 'checked'; // ถ้า de_id ตรงกับค่า user_department ให้กำหนด checked
+                    }
+                    echo "<input class='form-check-input' type='checkbox' name='departments[]' id='department_" . $row['de_id'] . "' value='" . $row['de_id'] . "' $selected>";
+                    echo "<label class='form-check-label' for='department_" . $row['de_id'] . "'>" . $row['de_name'] . "</label><br>";
+                }
+
+                // ปิดการเชื่อมต่อฐานข้อมูล
+                mysqli_close($con);
+                ?>
+            </div>
+
+            <div class="form-group mt-2">
+                <label for="additionalDetails">รายละเอียดเพิ่มเติม</label>
+                <textarea class="form-control" id="detail" name="detail" rows="3"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-3" name="AddSend" id="Addsend">ดำเนินการต่อ</button>
+        </form>
+    </div>
+
+    <script>
+        function Status(docin_id) {
+            var status = document.getElementById("Status");
+            var selectStatus = document.getElementById("SelectStatus");
+            var selectSendto = document.getElementById("SelectSendto");
+            var checkboxUser = document.getElementById("UserCheckbox");
+            var checkboxDepartment = document.getElementById("DepartmentCheckbox");
+
+            // เมื่อเลือก status รับทราบ : ดำเนินการต่อ
+            if (selectStatus.value === "2") {
+                // แสดงเลือกว่าจะส่งให้แผนกหรือรายบุคคล
+                selectSendto.style.display = "block";
+
+                // เรียกใช้ฟังก์ชันเพื่อแสดงส่วนที่เหมาะสมตามค่าของ selectSendto ที่เปลี่ยนแปลง
+                StatusSendto();
+            } else {
+                selectSendto.style.display = "none";
+                checkboxDepartment.style.display = "none";
+                checkboxUser.style.display = "none";
+            }
+
+            status.style.display = "block";
+        }
+
+        function CloseStatus() {
+            var status = document.getElementById("Status");
+
+            status.style.display = "none";
+        }
+
+        function StatusSendto() {
+            var selectSendto = document.getElementById("SelectSendto");
+            var checkboxUser = document.getElementById("UserCheckbox");
+            var checkboxDepartment = document.getElementById("DepartmentCheckbox");
+
+            if (selectSendto.value === "1") {
+                checkboxUser.style.display = "block";
+                checkboxDepartment.style.display = "none";
+            } else if (selectSendto.value === "2") {
+                checkboxDepartment.style.display = "block";
+                checkboxUser.style.display = "none";
+            } else {
+                checkboxDepartment.style.display = "none";
+                checkboxUser.style.display = "none";
+            }
+        }
+    </script>
+
+    <?php
+    require '../conDB.php';
+
+    if (isset($_POST['AddSend'])) {
+
+        // Execute SQL Query
+        if ($con->query($sql) === TRUE) {
+            echo '<script>window.location.href = window.location.href;</script>';
+        } else {
+            echo "Error: " . $sql . "<br>" . $con->error;
+        }
+    }
+    $con->close();
+    ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
