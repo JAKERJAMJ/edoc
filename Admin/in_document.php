@@ -48,9 +48,10 @@ require 'adminnav.php';
             require '../conDB.php';
 
             $sql = "SELECT in_doc.docin_id, in_doc.docin_number, in_doc.docin_date, in_doc.docin_title, in_doc.docin_sent_from, in_doc.docin_sent_to, in_doc.document_in, 
-        in_doc.recording_date, document_type.type_name
+        in_doc.recording_date, document_type.type_name, doc_status.status_name
         FROM in_doc
         LEFT JOIN document_type ON in_doc.type_id = document_type.type_id
+        LEFT JOIN doc_status ON in_doc.status_id = doc_status.status_id
         ORDER BY in_doc.docin_id DESC"; // เรียงจากใหม่สุดไปเก่าที่สุด
 
             $result = mysqli_query($con, $sql);
@@ -65,10 +66,10 @@ require 'adminnav.php';
                 echo "<td>" . $row['docin_sent_from'] . "</td>";
                 echo "<td>" . $row['docin_sent_to'] . "</td>";
                 echo "<td><a href='" . $row['document_in'] . "' download>ดาวน์โหลด</a></td>";
-                echo '<td><button type="button" class="btn btn-warning btn-sm" onclick="Status(' . $row['docin_id'] . ')">กำลังดำเนินการ</button></td>';
+                echo '<td><button type="button" class="btn btn-warning btn-sm" onclick="Status(' . $row['docin_id'] . ')">' . $row['status_name'] . '</button></td>';
                 echo "<td>" . date('d/m/Y H:i:s', strtotime($row['recording_date'])) . "</td>";
                 echo '<td>';
-                echo '<button type="button" class="btn btn-warning mr-2" onclick="Edit(' . $row['docin_id'] . ', \'' . $row['docin_number'] . '\', \'' . $row['docin_date'] . '\', \'' . $row['docin_title'] . '\', \'' . $row['docin_sent_from'] . '\', \'' . $row['docin_sent_to'] . '\')">แก้ไข</button>';
+                echo '<button type="button" class="btn btn-warning mr-2" onclick="Edit(' . $row['docin_id'] . ', \'' . $row['docin_number'] . '\', \'' . $row['docin_date'] . '\', \'' . $row['docin_title'] . '\', \'' . $row['docin_sent_from'] . '\', \'' . $row['docin_sent_to'] . '\', \'' . $row['status_id'] . '\')">แก้ไข</button>';
                 echo '&nbsp;';
                 echo '<button type="button" class="btn btn-danger" onclick="deleteIndoc(' . $row['docin_id'] . ')">ลบ</button> ';
                 echo '</td>';
@@ -132,6 +133,27 @@ require 'adminnav.php';
                     <label for="document_in"><strong>ไฟล์</strong></label>
                     <input type="file" id="document_in" name="document_in" accept="document_in/" class="form-control" placeholder="" value="">
                 </div>
+                <div class="form-group my-3">
+                    <strong>สถานะ</strong>
+                    <select name="doc_status" id="doc_status" class="form-select">
+
+                        <?php
+                        require '../conDB.php';
+
+                        // ดึงข้อมูลตำแหน่งจากฐานข้อมูล
+                        $sql = "SELECT * FROM doc_status ORDER BY status_id";
+                        $result = mysqli_query($con, $sql);
+
+                        // นำข้อมูลมาใส่ในแท็ก <option>
+                        while ($row = mysqli_fetch_array($result)) {
+                            echo "<option value='" . $row['status_id'] . "'>" . $row['status_name'] . "</option>";
+                        }
+
+                        // ปิดการเชื่อมต่อฐานข้อมูล
+                        mysqli_close($con);
+                        ?>
+                    </select>
+                </div>
                 <div class="from-group my-3">
                     <button type="submit" class="mt-3 btn btn-primary" name="SubmitAdd" id="SubmitAdd">Submit</button>
                     <button onclick="hideEdit()" id="close_add" class="mt-3 btn btn-danger">Close</button>
@@ -160,6 +182,7 @@ require 'adminnav.php';
         $docin_title = $_POST['docin_title'];
         $docin_sent_from = $_POST['docin_sent_from'];
         $docin_sent_to = $_POST['docin_sent_to'];
+        $status_id = $_POST['doc_status'];
 
         // การอัปโหลดไฟล์
         $target_dir = "../document_in/"; // ปรับเส้นทางตามที่ต้องการ
@@ -181,9 +204,9 @@ require 'adminnav.php';
         // เพิ่มข้อมูลลงในฐานข้อมูล
 
         $sql = "INSERT INTO in_doc (docin_id, type_id, docin_number, docin_date, docin_title, 
-                docin_sent_from, docin_sent_to, document_in, recording_date)
+                docin_sent_from, docin_sent_to, document_in, recording_date, status_id)
                 VALUES (NULL, '$type_id', '$docin_number', '$docin_date', '$docin_title',
-                '$docin_sent_from', '$docin_sent_to', '$document_in', NOW())";
+                '$docin_sent_from', '$docin_sent_to', '$document_in', NOW(), '$status_id')";
 
         // Execute SQL Query
         if ($con->query($sql) === TRUE) {
@@ -196,7 +219,7 @@ require 'adminnav.php';
     ?>
 
 
-    <div class="update-document" id="UpdateDocument">
+<div class="update-document" id="UpdateDocument">
         <div class="col-md-12">
             <div class="title-update">
                 แก้ไขเอกสารบันทึกข้อความ
@@ -358,10 +381,18 @@ require 'adminnav.php';
         <button type="button" class="close" aria-label="Close" onclick="CloseStatus()">X</button>
         <div class="title-status">สถานะ</div>
         <form action="in_document.php" enctype="multipart/form-data">
-            <select class="form-select mt-3" id="SelectStatus" onchange="Status()">
-                <option selected>กำลังดำเนินการ</option>
-                <option value="1">รับทราบ</option>
-                <option value="2">รับทราบ : ดำเนินการต่อ</option>
+            <select class="form-select mt-3" name="doc_status" id="SelectStatus" onchange="Status()">
+                <?php
+                require '../conDB.php';
+
+                // ดึงข้อมูลสถานะจากฐานข้อมูล
+                $sql_status = "SELECT * FROM doc_status ORDER BY status_id";
+                $result_status = mysqli_query($con, $sql_status);
+                while ($row_status = mysqli_fetch_array($result_status)) {
+                    echo "<option value='" . $row_status['status_id'] . "'>" . $row_status['status_name'] . "</option>";
+                }
+                mysqli_close($con);
+                ?>
             </select>
             <select class="form-select mt-3" id="SelectSendto" onchange="StatusSendto()" style="display: none;">
                 <option selected>ต้องการส่งเอกสารให้</option>
@@ -432,7 +463,7 @@ require 'adminnav.php';
             var checkboxDepartment = document.getElementById("DepartmentCheckbox");
 
             // เมื่อเลือก status รับทราบ : ดำเนินการต่อ
-            if (selectStatus.value === "2") {
+            if (selectStatus.value === "3") {
                 // แสดงเลือกว่าจะส่งให้แผนกหรือรายบุคคล
                 selectSendto.style.display = "block";
 
