@@ -62,3 +62,35 @@
     font-size: 22px;
     font-weight: bold;
 }
+.status {
+    display: none;
+    position: fixed;
+    flex-direction: column;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 3rem;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    text-align: center; /* จัดข้อความตรงกลาง */
+    width: 40%;
+    max-height: 80%;
+    left: 30%;
+    top: 10%;
+    z-index: 99999;
+    overflow-y: auto;
+}
+.status .title-status {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+.close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 5px;
+    background-color: #ffffff;
+    border: #ffffff solid;
+
+}

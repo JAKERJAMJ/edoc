@@ -219,7 +219,7 @@ require 'adminnav.php';
     ?>
 
 
-<div class="update-document" id="UpdateDocument">
+    <div class="update-document" id="UpdateDocument">
         <div class="col-md-12">
             <div class="title-update">
                 แก้ไขเอกสารบันทึกข้อความ
@@ -377,7 +377,7 @@ require 'adminnav.php';
     <!-- end delete function -->
 
 
-    <div class="status" id="Status">
+    <div class="status" id="EditStatus">
         <button type="button" class="close" aria-label="Close" onclick="CloseStatus()">X</button>
         <div class="title-status">สถานะ</div>
         <form action="in_document.php" enctype="multipart/form-data">
@@ -456,11 +456,12 @@ require 'adminnav.php';
 
     <script>
         function Status(docin_id) {
-            var status = document.getElementById("Status");
+            var status = document.getElementById("EditStatus");
             var selectStatus = document.getElementById("SelectStatus");
             var selectSendto = document.getElementById("SelectSendto");
             var checkboxUser = document.getElementById("UserCheckbox");
             var checkboxDepartment = document.getElementById("DepartmentCheckbox");
+            Status(docin_id);
 
             // เมื่อเลือก status รับทราบ : ดำเนินการต่อ
             if (selectStatus.value === "3") {
@@ -479,7 +480,7 @@ require 'adminnav.php';
         }
 
         function CloseStatus() {
-            var status = document.getElementById("Status");
+            var status = document.getElementById("EditStatus");
 
             status.style.display = "none";
         }
