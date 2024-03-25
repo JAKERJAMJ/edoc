@@ -18,6 +18,12 @@ if(!isset($user_id)) {
 </head>
 <body>
         <?php require_once 'nav_user.php'; ?>
+
+        <div class="container">
+            <div class="button-document">
+            <button type="button">เอกสารใหม่</button>
+            </div>
+        </div>
         
     
 

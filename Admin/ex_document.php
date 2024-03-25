@@ -463,7 +463,6 @@ require 'adminnav.php';
             var selectSendto = document.getElementById("SelectSendto");
             var checkboxUser = document.getElementById("UserCheckbox");
             var checkboxDepartment = document.getElementById("DepartmentCheckbox");
-            Status(docex_id);
 
             // เมื่อเลือก status รับทราบ : ดำเนินการต่อ
             if (selectStatus.value === "3") {

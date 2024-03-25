@@ -17,6 +17,7 @@
 }
 .view-document table th,td {
     text-align: center;
+    vertical-align: middle;
 }
 .add-document {
     display: none;

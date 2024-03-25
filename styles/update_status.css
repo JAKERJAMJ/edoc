@@ -1,0 +1,46 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: max-content;
+}
+.container .status-container {
+    margin-top: 10%;
+    padding: 20px;
+    box-shadow: 0px 0px 3px rgb(0, 0, 0,0.3);
+    width: 500px;
+    border-radius: 20px;
+    text-align: center;
+}
+.container .result-container {
+    padding: 20px;
+    text-align: center;
+}
+.result-container .resoult {
+    padding: 20px;
+    display: flex;
+    flex-direction: row;
+}
+.result-container .for-status {
+    background-color: aliceblue;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0px 0px 3px rgb(0, 0, 0,0.3);
+    text-align: center;
+    margin-right: 15px;
+}
+.result-container .send-to {
+    background-color: aliceblue;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0px 0px 3px rgb(0, 0, 0,0.3);
+    text-align: center;
+    margin-right: 15px;
+}
+.result-container .receive {
+    background-color: aliceblue;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0px 0px 3px rgb(0, 0, 0,0.3);
+    text-align: center;
+}
