@@ -22,18 +22,18 @@ $user_department = $_SESSION['department_id']; // เช่นเดียวก
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>สถานะ</title>
     <link rel="stylesheet" href="../styles/update_status.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 
 <body>
     <div class="btn-back">
-        <a href="in_document.php"><button type="button" class="btn btn-outline-dark">back</button></a>
+        <a href="ex_document.php"><button type="button" class="btn btn-outline-dark">back</button></a>
     </div>
     <?php
-    $docin_id = $_GET['id'];
-    $sql = "SELECT * FROM in_doc WHERE docin_id = '$docin_id' ";
+    $docex_id = $_GET['id'];
+    $sql = "SELECT * FROM ex_doc WHERE docex_id = '$docex_id' ";
     $result = mysqli_query($con, $sql);
     $row = mysqli_fetch_array($result);
     ?>
@@ -41,10 +41,10 @@ $user_department = $_SESSION['department_id']; // เช่นเดียวก
         <div class="status-container">
             <div class="status-title">
                 สถานะของเอกสาร <br>
-                เอกสารเลขที่ : <?= $row['docin_number'] ?>
+                เอกสารเลขที่ : <?= $row['docex_number'] ?>
             </div>
-            <form action="indoc_status.php?id=<?= $row['docin_id'] ?>" method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="docin_id" value="<?= $row['docin_id'] ?>">
+            <form action="exdoc_status.php?id=<?= $row['docex_id'] ?>" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="docex_id" value="<?= $row['docex_id'] ?>">
                 <div class="mb-3">
                     <select class="form-select mt-3" name="doc_status" id="SelectStatus" onchange="Status()">
                         <!-- แสดงสถานะเริ่มต้นของเอกสาร -->
@@ -195,20 +195,20 @@ $user_department = $_SESSION['department_id']; // เช่นเดียวก
         require '../conDB.php';
 
         if (isset($_POST['SubmitStatus'])) {
-            $ids = $_POST['docin_id']; // เพิ่มบรรทัดนี้เพื่อรับค่า docin_id จากฟอร์ม POST
+            $ids = $_POST['docex_id']; // เพิ่มบรรทัดนี้เพื่อรับค่า docin_id จากฟอร์ม POST
             $status_id = $_POST['doc_status'];
 
-            $sql_updateStatus = "UPDATE in_doc SET status_id = '$status_id' WHERE docin_id = '$ids'";
+            $sql_updateStatus = "UPDATE ex_doc SET status_id = '$status_id' WHERE docex_id = '$ids'";
 
             if (mysqli_query($con, $sql_updateStatus)) {
-                echo "<script>alert('อัปเดตข้อมูลเรียบร้อยแล้ว'); window.location.href = 'in_document.php';</script>";
+                echo "<script>alert('อัปเดตข้อมูลเรียบร้อยแล้ว'); window.location.href = window.location.href;</script>";
             } else {
                 echo "Error updating record: " . mysqli_error($con); // แสดงข้อผิดพลาด
             }
         }
 
         if (isset($_POST['SubmitDe'])) {
-            $docin_id = $_POST['docin_id'];
+            $docex_id = $_POST['docex_id'];
             $detail = $_POST['detail'];
 
             // Retrieve selected departments
@@ -229,17 +229,17 @@ $user_department = $_SESSION['department_id']; // เช่นเดียวก
                     // Insert records into user_history_in for each user in the department
                     foreach ($userIds as $userId) {
                         $receivedTime = date('Y-m-d H:i:s'); // Current time
-                        $sqlInsertHistoryIn = "INSERT INTO user_history_in (docin_id, user_id, detail, received_id, received_time) VALUES ('$docin_id', '$userId', '$detail', '1', '$receivedTime')";
+                        $sqlInsertHistoryIn = "INSERT INTO user_history_ex (docin_id, user_id, detail, received_id, received_time) VALUES ('$docex_id', '$userId', '$detail', '1', '$receivedTime')";
                         mysqli_query($con, $sqlInsertHistoryIn);
                     }
                 }
 
                 // Update the document status to "Received and Processed"
                 $statusId = 2; // Assuming "Received and Processed" status has ID 2
-                $sqlUpdateStatus = "UPDATE in_doc SET status_id = '$statusId' WHERE docin_id = '$docin_id'";
+                $sqlUpdateStatus = "UPDATE ex_doc SET status_id = '$statusId' WHERE docex_id = '$docin_id'";
                 mysqli_query($con, $sqlUpdateStatus);
 
-                echo "<script>alert('ส่งเอกสารให้ทุกคนในแผนกที่เลือกสำเร็จ'); window.location.href = 'in_document.php';</script>";
+                echo "<script>alert('ส่งเอกสารให้ทุกคนในแผนกที่เลือกสำเร็จ'); window.location.href = window.location.href;</script>";
             } else {
                 echo "<script>alert('โปรดเลือกอย่างน้อยหนึ่งแผนก');</script>";
             }
@@ -248,13 +248,13 @@ $user_department = $_SESSION['department_id']; // เช่นเดียวก
 
 
         if (isset($_POST['SubmitUser'])) {
-            $docin_id = $_POST['docin_id'];
+            $docex_id = $_POST['docex_id'];
             $user_ids = $_POST['users']; // รับค่าผู้ใช้ที่ถูกเลือกจาก checkbox
             $detail = $_POST['detail'];
 
             foreach ($user_ids as $user_id) {
                 $received_time = date('Y-m-d H:i:s'); // เวลาปัจจุบัน
-                $sql_insertHistoryIn = "INSERT INTO user_history_in (docin_id, user_id, detail, received_id, received_time) VALUES ('$docin_id', '$user_id', '$detail', '1', '$received_time')";
+                $sql_insertHistoryIn = "INSERT INTO user_history_ex (docin_id, user_id, detail, received_id, received_time) VALUES ('$docex_id', '$user_id', '$detail', '1', '$received_time')";
                 mysqli_query($con, $sql_insertHistoryIn);
             }
 
@@ -263,7 +263,7 @@ $user_department = $_SESSION['department_id']; // เช่นเดียวก
             if (count($user_ids) > 0) {
                 // อัปเดตสถานะของเอกสารเป็น "รับทราบและดำเนินการต่อ"
                 $status_id = 2; // สมมติว่าสถานะ "รับทราบและดำเนินการต่อ" มี ID เป็น 2
-                $sql_updateStatus = "UPDATE in_doc SET status_id = '$status_id' WHERE docin_id = '$docin_id'";
+                $sql_updateStatus = "UPDATE ex_doc SET status_id = '$status_id' WHERE docex_id = '$docex_id'";
                 mysqli_query($con, $sql_updateStatus);
 
                 echo "<script>alert('ส่งเอกสารให้ผู้ใช้เรียบร้อยแล้ว'); window.location.href = window.location.href; </script>";
@@ -277,11 +277,11 @@ $user_department = $_SESSION['department_id']; // เช่นเดียวก
             <div class="resoult">
                 <div class="for-status">
                     <?php
-                    $docin_id = $_GET['id']; // รับค่า id จาก URL
+                    $docex_id = $_GET['id']; // รับค่า id จาก URL
                     $sql = "SELECT doc_status.status_name
-                            FROM in_doc
-                            JOIN doc_status ON in_doc.status_id = doc_status.status_id
-                            WHERE in_doc.docin_id = '$docin_id'";
+                            FROM ex_doc
+                            JOIN doc_status ON ex_doc.status_id = doc_status.status_id
+                            WHERE ex_doc.docex_id = '$docex_id'";
                     $result = mysqli_query($con, $sql);
                     if ($row = mysqli_fetch_assoc($result)) {
                         echo "สถานะปัจจุบัน<br> " . $row['status_name'];

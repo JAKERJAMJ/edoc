@@ -14,7 +14,7 @@ if (!isset($user_id)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UserController</title>
+    <title>คลังเอกสาร</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="../styles/user.css">
 </head>
@@ -24,11 +24,12 @@ if (!isset($user_id)) {
 
     <div class="container">
         <div class="button-container">
-            <a href="UserController.php"><button type="button" class="new-doc-button">เอกสารใหม่</button></a>
+            <a href="UserController.php"><button type="button">เอกสารใหม่</button></a>
             <a href="document.php"><button type="button">คลังเอกสาร</button></a>
         </div>
     </div>
-    <p class="title-history">เอกสารที่ยังไม่ได้รับ</p>
+
+    <p class="document-title">คลังเอกสาร</p>
     <div class="history">
         <p class="in-document">บันทึกข้อความเข้า</p>
         <table class="table table-bordered">
@@ -41,8 +42,7 @@ if (!isset($user_id)) {
                 <th width="100px">ถึง</th>
                 <th width="120px">ไฟล์เอกสาร</th>
                 <th width="170px">สถานะ</th>
-                <th width="100px">รายละเอียด</th>
-                <th width="200px">Action</th>
+                <th width="200px">รายละเอียด</th>
             </tr>
             <?php
             require '../conDB.php';
@@ -54,7 +54,7 @@ if (!isset($user_id)) {
             LEFT JOIN document_type ON in_doc.type_id = document_type.type_id
             LEFT JOIN doc_status ON in_doc.status_id = doc_status.status_id
             LEFT JOIN received ON user_history_in.received_id = received.received_id
-            WHERE user_history_in.user_id = ? AND user_history_in.received_id = 1
+            WHERE user_history_in.user_id = ? AND user_history_in.received_id = 2
             ORDER BY in_doc.docin_id DESC";
 
 
@@ -74,11 +74,8 @@ if (!isset($user_id)) {
                 echo "<td>" . $row['docin_sent_from'] . "</td>";
                 echo "<td>" . $row['docin_sent_to'] . "</td>";
                 echo "<td><a href='" . $row['document_in'] . "' download>ดาวน์โหลด</a></td>";
-                echo "<td><button type='button' class='btn btn-warning btn-sm'>" . $row['received_name'] . "</button></td>";
+                echo "<td><button type='button' class='btn btn-success btn-sm'>" . $row['received_name'] . "</button></td>";
                 echo "<td>" . $row['detail'] . "</td>";
-                echo '<td>';
-                echo '<button type="button" class="btn btn-success mr-2" onclick="receiveDocument(\'' . $row['user_history_id'] . '\')">รับเอกสาร</button>';
-                echo '</td>';
                 echo "</tr>";
 
                 $counter--; // Decrement the counter to display the correct order
@@ -86,62 +83,6 @@ if (!isset($user_id)) {
             }
             ?>
         </table>
-        <div class="submit-documentin" id="submitDocin">
-            <form action="UserController.php" method="post">
-                <input type="hidden" name="user_history_id" id="user_history_id">
-                <button type="submit" class="btn btn-success" name="submit" id="submit">รับเอกสาร</button>
-                <button type="button" class="btn btn-danger" id="close" onclick="close()">ปิด</button>
-            </form>
-        </div>
-        <script>
-            function receiveDocument(user_history_id) {
-                var docin = document.getElementById('submitDocin');
-                document.getElementById("user_history_id").value = user_history_id;
-
-                docin.style.display = "block";
-            }
-
-            function close() {
-                var docin = document.getElementById('submitDocin');
-                docin.style.display = "none";
-            }
-        </script>
-
-        <?php
-        require '../conDB.php';
-
-        if (isset($_POST['submit'])) {
-            // Validate and sanitize the input
-            $history_docin = mysqli_real_escape_string($con, $_POST['user_history_id']);
-            $received_date = date('Y-m-d');
-        
-            // Prepare the SQL statement using Prepared Statements
-            $updateQuery = "UPDATE user_history_in SET received_id = '2', received_time = ? WHERE user_history_id = ?";
-            $stmt = mysqli_prepare($con, $updateQuery);
-            mysqli_stmt_bind_param($stmt, "si", $received_date, $history_docin);
-        
-            if (mysqli_stmt_execute($stmt)) {
-                echo "<script>window.location.href = window.location.href;</script>";
-            } else {
-                echo "Error: " . mysqli_error($con) . "<br>";
-                echo "<script>alert('ผิดพลาด');</script>";
-            }
-        
-            mysqli_stmt_close($stmt);
-        }        
-        ?>
-
-        <p class="ex-document">เอกสารภายนอก</p>
-    </div>
-
-
-
-
-
-
-
-
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 

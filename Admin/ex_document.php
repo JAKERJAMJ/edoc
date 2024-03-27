@@ -10,6 +10,7 @@ if (!isset($_SESSION['admin'])) {
 }
 require 'adminnav.php';
 // หากผู้ใช้ล็อกอินแล้วให้แสดงเนื้อหาของหน้าเว็บไซต์ต่อไปนี้
+require '../conDB.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -55,28 +56,29 @@ require 'adminnav.php';
         ORDER BY ex_doc.docex_id DESC"; // เรียงจากใหม่สุดไปเก่าที่สุด
 
             $result = mysqli_query($con, $sql);
-            $counter = mysqli_num_rows($result);
-            // สมมติว่าคอลัมน์ 'status' เก็บข้อมูลสถานะ
+            $counter = mysqli_num_rows($result); // นับจำนวนแถวทั้งหมดในผลลัพธ์
+
             while ($row = mysqli_fetch_array($result)) {
                 echo "<tr>";
-                echo "<td>" . $counter . "</td>";
+                echo "<td>" . $counter . "</td>"; // ใช้ค่า $counter ที่ถูกนับลำดับแล้ว
                 echo "<td>" . $row['docex_number'] . "</td>";
                 echo "<td>" . date('d/m/Y', strtotime($row['docex_date'])) . "</td>";
                 echo "<td>" . $row['docex_title'] . "</td>";
                 echo "<td>" . $row['docex_sent_from'] . "</td>";
                 echo "<td>" . $row['docex_sent_to'] . "</td>";
                 echo "<td><a href='" . $row['document_ex'] . "' download>ดาวน์โหลด</a></td>";
-                echo '<td><button type="button" class="btn btn-warning btn-sm" onclick="Status(' . $row['docex_id'] . ')">' . $row['status_name'] . '</button></td>';
+                echo "<td><a href='exdoc_status.php?id=".$row['docex_id']."'><button type='button' class='btn btn-warning btn-sm'>" . $row['status_name'] . "</button></td>";
                 echo "<td>" . date('d/m/Y H:i:s', strtotime($row['recording_date'])) . "</td>";
                 echo '<td>';
-                echo '<button type="button" class="btn btn-warning mr-2" onclick="Edit(' . $row['docex_id'] . ', \'' . $row['docex_number'] . '\', \'' . $row['docex_date'] . '\', \'' . $row['docex_title'] . '\', \'' . $row['docex_sent_from'] . '\', \'' . $row['docex_sent_to'] . '\')">แก้ไข</button>';
+                echo '<button type="button" class="btn btn-warning mr-2" onclick="Edit(' . $row['docex_id'] . ', \'' . $row['docex_number'] . '\', \'' . $row['docex_date'] . '\', \'' . $row['docex_title'] . '\', \'' . $row['docex_sent_from'] . '\', \'' . $row['docex_sent_to'] . '\', \'' . $row['status_id'] . '\')">แก้ไข</button>';
                 echo '&nbsp;';
-                echo '<button type="button" class="btn btn-danger" onclick="deleteExdoc(' . $row['docex_id'] . ')">ลบ</button> ';
+                echo '<button type="button" class="btn btn-danger" onclick="deleteIndoc(' . $row['docex_id'] . ')">ลบ</button> ';
                 echo '</td>';
                 echo "</tr>";
 
-                $counter--;
+                $counter--; // ลดค่า $counter ลงทีละหนึ่งเพื่อแสดงลำดับที่ถูกต้อง
             }
+
             ?>
         </table>
     </div>
@@ -84,7 +86,7 @@ require 'adminnav.php';
     <div class="add-document" id="AddDocument">
         <div class="col-md-12">
             <div class="title-add">
-                เพิ่มเอกสารบันทึกข้อความ
+                เพิ่มหนังสือเข้าภายนอก
             </div>
             <form action="ex_document.php" method="POST" enctype="multipart/form-data">
                 <div class="form-group my-3">
@@ -104,9 +106,7 @@ require 'adminnav.php';
 
                         // นำข้อมูลมาใส่ในแท็ก <option>
                         while ($row = mysqli_fetch_array($result)) {
-                            // ตรวจสอบว่าเป็น type id ที่ต้องการให้เป็นตัวเลือกแรกหรือไม่
-                            $selected = ($row['type_id'] == 2) ? 'selected' : '';
-                            echo "<option value='" . $row['type_id'] . "' $selected>" . $row['type_name'] . "</option>";
+                            echo "<option value='" . $row['type_id'] . "'>" . $row['type_name'] . "</option>";
                         }
 
                         // ปิดการเชื่อมต่อฐานข้อมูล
@@ -116,7 +116,7 @@ require 'adminnav.php';
                 </div>
                 <div class="form-group my-3">
                     <label for="docex_date"><strong>ลงวันที่</strong></label>
-                    <input type="date" id="docex_date" name="docex_date" class="form-control" placeholder="" value="">
+                    <input type="date" id="docex_date_add" name="docex_date" class="form-control" placeholder="" value="">
                 </div>
                 <div class="form-group my-3">
                     <label for="docex_title"><strong>เรื่อง</strong></label>
@@ -136,8 +136,7 @@ require 'adminnav.php';
                 </div>
                 <div class="form-group my-3">
                     <strong>สถานะ</strong>
-                    <select name="doc_status" id="doc_status" class="form-select">
-
+                    <select name="doc_status" id="doc_status" class="form-select"ex
                         <?php
                         require '../conDB.php';
 
@@ -156,8 +155,8 @@ require 'adminnav.php';
                     </select>
                 </div>
                 <div class="from-group my-3">
-                    <button type="submit" class="mt-3 btn btn-primary" name="submit_add" id="submit_add">Submit</button>
-                    <button onclick="hideAdd()" id="close_add" class="mt-3 btn btn-danger">Close</button>
+                    <button type="submit" class="mt-3 btn btn-primary" name="SubmitAdd" id="SubmitAdd">Submit</button>
+                    <button onclick="hideEdit()" id="close_add" class="mt-3 btn btn-danger">Close</button>
                 </div>
         </div>
     </div>
@@ -175,7 +174,7 @@ require 'adminnav.php';
 
     <?php
     require '../conDB.php';
-    if (isset($_POST['submit_add'])) {
+    if (isset($_POST['SubmitAdd'])) {
         // รับข้อมูลจากฟอร์ม
         $docex_number = $_POST['docex_number'];
         $type_id = $_POST['document_type'];
@@ -199,7 +198,7 @@ require 'adminnav.php';
         // ประมวลผลและย้ายไฟล์ทั้งหมด
         $document_ex = $target_dir . createNewFileName($_FILES["document_ex"]["name"]);
         move_uploaded_file($_FILES["document_ex"]["tmp_name"], $document_ex);
-        // ทำซ้ำสำหรับ car_picture2, car_picture3, และ car_picture4 ...
+
 
 
         // เพิ่มข้อมูลลงในฐานข้อมูล
@@ -219,12 +218,11 @@ require 'adminnav.php';
     $con->close();
     ?>
 
-    <!-- edit function -->
 
     <div class="update-document" id="UpdateDocument">
         <div class="col-md-12">
             <div class="title-update">
-                แก้ไขเอกสารภายนอก
+                แก้ไขเอกสารบันทึกข้อความ
             </div>
             <form action="ex_document.php" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="update_docex_id" id="update_docex_id" placeholder="" value="">
@@ -330,7 +328,7 @@ require 'adminnav.php';
 
 
         // อัปเดตข้อมูลในฐานข้อมูล
-        $sql_update = "UPDATE in_doc SET 
+        $sql_update = "UPDATE ex_doc SET 
         docex_number = ?, 
         docex_date = ?, 
         docex_title = ?, 
@@ -360,7 +358,7 @@ require 'adminnav.php';
     <!-- delete function -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-        function deleteExdoc(docex_id) {
+        function deleteIndoc(docex_id) {
             if (confirm("คุณต้องการลบรายการนี้ใช่หรือไม่?")) {
                 // ส่งคำร้องขอ AJAX ไปยังไฟล์ PHP เพื่อลบข้อมูล
                 var xhr = new XMLHttpRequest();
@@ -376,133 +374,10 @@ require 'adminnav.php';
             }
         }
     </script>
+    <!-- end delete function -->
 
-    <!-- function ในการแก้ไขสถานะของเอกสารและส่งเอกสารไปหา user ต่างๆ -->
 
-    <div class="status" id="EditStatus">
-        <button type="button" class="close" aria-label="Close" onclick="CloseStatus()">X</button>
-        <div class="title-status">สถานะ</div>
-        <form action="ex_document.php" enctype="multipart/form-data">
-            <select class="form-select mt-3" name="doc_status" id="SelectStatus" onchange="Status()">
-                <?php
-                require '../conDB.php';
 
-                // ดึงข้อมูลสถานะจากฐานข้อมูล
-                $sql_status = "SELECT * FROM doc_status ORDER BY status_id";
-                $result_status = mysqli_query($con, $sql_status);
-                while ($row_status = mysqli_fetch_array($result_status)) {
-                    echo "<option value='" . $row_status['status_id'] . "'>" . $row_status['status_name'] . "</option>";
-                }
-                mysqli_close($con);
-                ?>
-            </select>
-            <select class="form-select mt-3" id="SelectSendto" onchange="StatusSendto()" style="display: none;">
-                <option selected>ต้องการส่งเอกสารให้</option>
-                <option value="1">รายบุคคล</option>
-                <option value="2">แผนก</option>
-            </select>
-            <div class="form-check mt-2" id="UserCheckbox" style="display: none;">
-                <?php
-                require '../conDB.php';
-
-                // ดึงข้อมูลผู้ใช้จากฐานข้อมูล
-                $sql = "SELECT * FROM user ORDER BY user_id";
-                $result = mysqli_query($con, $sql);
-
-                // นำข้อมูลมาใส่ใน checkbox
-                while ($row = mysqli_fetch_array($result)) {
-                    $selected = ''; // เพิ่มตัวแปรเพื่อเก็บค่า selected
-                    if ($row['user_id'] == $user_user) { // อาจเกิดปัญหาที่นี่เนื่องจากตัวแปร $user_user ไม่ได้ถูกกำหนดค่า
-                        $selected = 'checked'; // ถ้า user_id ตรงกับค่า user_user ให้กำหนด checked
-                    }
-                    echo "<input class='form-check-input' type='checkbox' name='users[]' id='user_" . $row['user_id'] . "' value='" . $row['user_id'] . "' $selected>";
-                    echo "<label class='form-check-label' for='user_" . $row['user_id'] . "'>" . $row['name_user'] . "</label><br>";
-                }
-
-                // ปิดการเชื่อมต่อฐานข้อมูล
-                mysqli_close($con);
-                ?>
-            </div>
-
-            <div class="form-check mt-2" id="DepartmentCheckbox" style="display: none;">
-                <?php
-                require '../conDB.php';
-
-                // ดึงข้อมูลตำแหน่งจากฐานข้อมูล
-                $sql = "SELECT * FROM department ORDER BY de_id";
-                $result = mysqli_query($con, $sql);
-
-                // นำข้อมูลมาใส่ใน checkbox
-                while ($row = mysqli_fetch_array($result)) {
-                    $selected = ''; // เพิ่มตัวแปรเพื่อเก็บค่า selected
-                    if ($row['de_id'] == $user_department) {
-                        $selected = 'checked'; // ถ้า de_id ตรงกับค่า user_department ให้กำหนด checked
-                    }
-                    echo "<input class='form-check-input' type='checkbox' name='departments[]' id='department_" . $row['de_id'] . "' value='" . $row['de_id'] . "' $selected>";
-                    echo "<label class='form-check-label' for='department_" . $row['de_id'] . "'>" . $row['de_name'] . "</label><br>";
-                }
-
-                // ปิดการเชื่อมต่อฐานข้อมูล
-                mysqli_close($con);
-                ?>
-            </div>
-
-            <div class="form-group mt-2">
-                <label for="additionalDetails">รายละเอียดเพิ่มเติม</label>
-                <textarea class="form-control" id="detail" name="detail" rows="3"></textarea>
-            </div>
-
-            <button type="submit" class="btn btn-primary mt-3" name="AddSend" id="Addsend">ดำเนินการต่อ</button>
-        </form>
-    </div>
-
-    <script>
-        function Status(docex_id) {
-            var status = document.getElementById("EditStatus");
-            var selectStatus = document.getElementById("SelectStatus");
-            var selectSendto = document.getElementById("SelectSendto");
-            var checkboxUser = document.getElementById("UserCheckbox");
-            var checkboxDepartment = document.getElementById("DepartmentCheckbox");
-
-            // เมื่อเลือก status รับทราบ : ดำเนินการต่อ
-            if (selectStatus.value === "3") {
-                // แสดงเลือกว่าจะส่งให้แผนกหรือรายบุคคล
-                selectSendto.style.display = "block";
-
-                // เรียกใช้ฟังก์ชันเพื่อแสดงส่วนที่เหมาะสมตามค่าของ selectSendto ที่เปลี่ยนแปลง
-                StatusSendto();
-            } else {
-                selectSendto.style.display = "none";
-                checkboxDepartment.style.display = "none";
-                checkboxUser.style.display = "none";
-            }
-
-            status.style.display = "block";
-        }
-
-        function CloseStatus() {
-            var status = document.getElementById("EditStatus");
-
-            status.style.display = "none";
-        }
-
-        function StatusSendto() {
-            var selectSendto = document.getElementById("SelectSendto");
-            var checkboxUser = document.getElementById("UserCheckbox");
-            var checkboxDepartment = document.getElementById("DepartmentCheckbox");
-
-            if (selectSendto.value === "1") {
-                checkboxUser.style.display = "block";
-                checkboxDepartment.style.display = "none";
-            } else if (selectSendto.value === "2") {
-                checkboxDepartment.style.display = "block";
-                checkboxUser.style.display = "none";
-            } else {
-                checkboxDepartment.style.display = "none";
-                checkboxUser.style.display = "none";
-            }
-        }
-    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>

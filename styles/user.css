@@ -27,3 +27,98 @@
     font-size: 20px;
     margin-bottom: 15px;
 }
+.container {
+    display: flex;
+    width: max-content;
+    align-items: center;
+    margin-top: 5%;
+}
+.container .button-container {
+    align-items: center;
+    text-align: center;
+}
+.history {
+    display: block;
+    padding: 50px;
+}
+.history table {
+    margin: auto;
+}
+.history table th,td {
+    text-align: center;
+    vertical-align: middle;
+}
+.title-history {
+    text-align: center;
+    width: 300px;
+    margin-top: 20px;
+    margin-left: 50px;
+    font-size: 25px;
+    font-weight: 400;
+    padding: 15px;
+    background-color: rgb(249, 139, 139);
+    border-radius: 20px;
+    color: rgb(95, 95, 95);
+    box-shadow: 0px 0px 5px rgb(255, 143, 143); /* เพิ่ม box-shadow นี้ */
+    transition: box-shadow 0.5s ease; /* เพิ่ม transition สำหรับ box-shadow */
+}
+
+.title-history:hover {
+    box-shadow: none; /* ให้ box-shadow หายไปเมื่อ hover */
+}
+.history .in-document {
+    font-size: 22px;
+    font-weight: bold;
+}
+.submit-documentin {
+    display: none;
+    position: fixed;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 3rem;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    text-align: center; /* จัดข้อความตรงกลาง */
+    width: 30%;
+    max-height: 80%;
+    left: 35%;
+    top: 45%;
+    z-index: 99999;
+}
+.submit-documentin #submit {
+    margin-right: 15px;
+}
+.document-title {
+    text-align: center;
+    width: 300px;
+    margin-top: 20px;
+    margin-left: 50px;
+    font-size: 25px;
+    font-weight: 400;
+    padding: 15px;
+    background-color: rgb(150, 253, 116);
+    border-radius: 20px;
+    color: rgb(95, 95, 95);
+    box-shadow: 0px 0px 5px rgb(87, 255, 75); /* เพิ่ม box-shadow นี้ */
+    transition: box-shadow 0.5s ease; /* เพิ่ม transition สำหรับ box-shadow */
+}
+.document-title:hover {
+    box-shadow: none; /* ให้ box-shadow หายไปเมื่อ hover */
+}
+
+.new-doc-indicator {
+    display: none;
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    border-radius: 50%;
+    margin-left: 5px;
+}
+
+.new-doc-button.new-doc-exists .new-doc-indicator {
+    display: inline-block;
+}
+.ex-document {
+    margin-top: 20px;
+}
